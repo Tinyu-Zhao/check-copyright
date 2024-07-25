@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# SPDX-FileCopyrightText: 2021-2022 Espressif Systems (Shanghai) CO LTD
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+#
+# SPDX-License-Identifier: MIT
 """
 Check files for copyright headers:
 - file not on ignore list:
-    - old Espressif copyright -> replace with SPDX
     - SPDX with invalid year or old company name -> replace with valid SPDX
     - other SPDX copyright -> PASS
     - non-SPDX copyright -> FAIL
-    - no copyright -> insert Espressif copyright
+    - no copyright -> insert m5stack copyright
 - file on ignore list:
-    - old Espressif copyright -> replace with SPDX, remove from ignore list
+    - old m5stack copyright -> replace with SPDX, remove from ignore list
     - SPDX with invalid year or company format -> replace with valid SPDX and remove from ignore list
     else -> keep on ignore list
 """
@@ -39,7 +39,7 @@ CHECK_FAIL_MESSAGE = textwrap.dedent('''\
     an SPDX-FileCopyrightText and an SPDX-License-Identifier with an allowed license for the section.
     More information about SPDX license identifiers can be found here:
     https://spdx.github.io/spdx-spec/appendix-V-using-SPDX-short-identifiers-in-source-files/
-    To have this hook automatically insert the standard Espressif copyright notice,
+    To have this hook automatically insert the standard m5stack copyright notice,
     ensure the word "copyright" is not in any comment up to line 30 and the file is not on the ignore list.
     Below is a list of files, which failed the copyright check.
     ''')
@@ -58,34 +58,19 @@ CHECK_FOOTER_MESSAGE = textwrap.dedent('''\
 
 # This is an old header style, which this script
 # attempts to detect and replace with a new SPDX license identifier
-OLD_APACHE_HEADER = textwrap.dedent('''\
-    Copyright 2015-2019 Espressif Systems (Shanghai) PTE LTD
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-    ''')
 
 
 # New headers to be used
 NEW_APACHE_HEADER_PYTHON = textwrap.dedent('''\
-    # SPDX-FileCopyrightText: {years} Espressif Systems (Shanghai) CO LTD
-    # SPDX-License-Identifier: Apache-2.0
+    # SPDX-FileCopyrightText: {years} M5Stack Technology CO LTD
+    # SPDX-License-Identifier: MIT
     ''')
 
 NEW_APACHE_HEADER = textwrap.dedent('''\
     /*
-     * SPDX-FileCopyrightText: {years} Espressif Systems (Shanghai) CO LTD
+     * SPDX-FileCopyrightText: {years} M5Stack Technology CO LTD
      *
-     * SPDX-License-Identifier: Apache-2.0
+     * SPDX-License-Identifier: MIT
      */
     ''')
 # filetype -> mime
@@ -249,19 +234,6 @@ def has_valid_copyright(file_name: str, mime: str, is_on_ignore: bool, is_new_fi
         valid = True
         return valid, modified
 
-    if args.replace:
-        try:
-            year, line = detect_old_header_style(file_name, comments, args)
-        except NotFound as e:
-            if args.debug:
-                print(f'{TERMINAL_GRAY}{e} in {file_name}{TERMINAL_RESET}')
-        else:
-            if not args.dry_run:
-                code_lines = replace_copyright(code_lines, year, line, mime, file_name)
-            else:
-                raise NeedsToBeUpdated(file_name)
-            valid = True
-
     for comment in comments:
         if comment.line_number() > args.max_lines:
             break
@@ -273,18 +245,18 @@ def has_valid_copyright(file_name: str, mime: str, is_on_ignore: bool, is_new_fi
                 if is_new_file:
                     years = (0, None)
                 else:
-                    years = extract_years_from_espressif_notice(matches.group(1))
+                    years = extract_years_from_m5stack_notice(matches.group(1))
             except NotFound as e:
                 if args.verbose:
                     print(f'{TERMINAL_GRAY}Not an {e.thing} {file_name}:{comment.line_number()}{TERMINAL_RESET}')
             else:
-                template = '// SPDX-FileCopyrightText: ' + config_section['espressif_copyright']
+                template = '// SPDX-FileCopyrightText: ' + config_section['m5stack_copyright']
                 if comment.is_multiline():
-                    template = ' * SPDX-FileCopyrightText: ' + config_section['espressif_copyright']
+                    template = ' * SPDX-FileCopyrightText: ' + config_section['m5stack_copyright']
                 if comment.is_first_in_multiline():
-                    template = '/* SPDX-FileCopyrightText: ' + config_section['espressif_copyright']
+                    template = '/* SPDX-FileCopyrightText: ' + config_section['m5stack_copyright']
                 if mime == MIME['python']:
-                    template = '# SPDX-FileCopyrightText: ' + config_section['espressif_copyright']
+                    template = '# SPDX-FileCopyrightText: ' + config_section['m5stack_copyright']
                 candidate_line = template.format(years=format_years(years[0], file_name))
                 no_time_update = template.format(years=format_years(years[0], file_name, years[1] or years[0]))
                 if code_lines[comment.line_number() - 1] != no_time_update or lines_changed >= args.lines_changed:
@@ -300,18 +272,18 @@ def has_valid_copyright(file_name: str, mime: str, is_on_ignore: bool, is_new_fi
                 if is_new_file:
                     years = (0, None)
                 else:
-                    years = extract_years_from_espressif_notice(matches.group(1))
+                    years = extract_years_from_m5stack_notice(matches.group(1))
             except NotFound as e:
                 if args.debug:
                     print(f'{TERMINAL_GRAY}Not an {e.thing} {file_name}:{comment.line_number()}{TERMINAL_RESET}')
             else:
-                template = '// SPDX-FileContributor: ' + config_section['espressif_copyright']
+                template = '// SPDX-FileContributor: ' + config_section['m5stack_copyright']
                 if comment.is_multiline():
-                    template = ' * SPDX-FileContributor: ' + config_section['espressif_copyright']
+                    template = ' * SPDX-FileContributor: ' + config_section['m5stack_copyright']
                 if comment.is_first_in_multiline():
-                    template = '/* SPDX-FileContributor: ' + config_section['espressif_copyright']
+                    template = '/* SPDX-FileContributor: ' + config_section['m5stack_copyright']
                 if mime == MIME['python']:
-                    template = '# SPDX-FileContributor: ' + config_section['espressif_copyright']
+                    template = '# SPDX-FileContributor: ' + config_section['m5stack_copyright']
                 candidate_line = template.format(years=format_years(years[0], file_name))
                 no_time_update = template.format(years=format_years(years[0], file_name, years[1] or years[0]))
                 if code_lines[comment.line_number() - 1] != no_time_update or lines_changed >= args.lines_changed:
@@ -382,62 +354,16 @@ def insert_copyright(code_lines: list, file_name: str, mime: str, config_section
     return new_code_lines
 
 
-def extract_years_from_espressif_notice(notice: str) -> Tuple[int, Optional[int]]:
+def extract_years_from_m5stack_notice(notice: str) -> Tuple[int, Optional[int]]:
     """
-    Extracts copyright years from a Espressif copyright notice. It returns a tuple (x, y) where x is the first year of
+    Extracts copyright years from a M5Stack copyright notice. It returns a tuple (x, y) where x is the first year of
     the copyright and y is the second year. y is None if the copyright notice contains only one year.
     """
-    matches = re.search(r'(\d{4})(-(\d{4}))? Espressif Systems', notice, re.IGNORECASE)
+    matches = re.search(r'(\d{4})(-(\d{4}))? M5Stack Systems', notice, re.IGNORECASE)
     if matches:
         years = matches.group(1, 3)
         return (int(years[0]), int(years[1]) if years[1] else None)
-    raise NotFound('Espressif copyright notice')
-
-
-def replace_copyright(code_lines: list, year: int, line: int, mime: str, file_name: str) -> list:
-    """
-    Replaces old header style with new SPDX form.
-    """
-    # replace from line number (line) to line number (line + number of lines in the OLD HEADER)
-    # with new header depending on file type
-    end = line + OLD_APACHE_HEADER.count('\n')
-    del code_lines[line - 1:end - 1]
-
-    template = NEW_APACHE_HEADER
-    if mime == MIME['python']:
-        template = NEW_APACHE_HEADER_PYTHON
-    code_lines[line - 1:line - 1] = template.format(years=format_years(year, file_name)).splitlines()
-
-    print(f'{TERMINAL_BOLD}"{file_name}": replacing old Apache-2.0 header (lines: {line}-{end}) with the new SPDX header.{TERMINAL_RESET}')
-
-    return code_lines
-
-
-def detect_old_header_style(file_name: str, comments: list, args: argparse.Namespace) -> Tuple[int, int]:
-    """
-    Detects old header style (Apache-2.0) and extracts the year and line number.
-    returns: Tuple[year, comment line number]
-    """
-    comments_text = str()
-    for comment in comments:
-        if comment.line_number() > args.max_lines:
-            break
-        comments_text = f'{comments_text}\n{comment.text().strip()}'
-    ratio = fuzz.partial_ratio(comments_text, OLD_APACHE_HEADER)
-    if args.debug:
-        print(f'{TERMINAL_GRAY}ratio for {file_name}: {ratio}{TERMINAL_RESET}')
-    if ratio > args.fuzzy_ratio:
-        for comment in comments:
-            # only check up to line number MAX_LINES
-            if comment.line_number() > args.max_lines:
-                break
-            try:
-                year = extract_years_from_espressif_notice(comment.text())[0]
-            except NotFound:
-                pass
-            else:
-                return (year, comment.line_number())
-    raise NotFound('Old Espressif header')
+    raise NotFound('M5Stack copyright notice')
 
 
 def format_years(past: int, file_name: str, today: Optional[int]=None) -> str:

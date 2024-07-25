@@ -1,16 +1,17 @@
-# SPDX-FileCopyrightText: 2022 Espressif Systems (Shanghai) CO LTD
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+#
+# SPDX-License-Identifier: MIT
 
 import setuptools
 
-AUTHOR = 'Espressif Systems'
-MAINTAINER = 'Dmitry Bondarenko'
-EMAIL = 'dmitry.bondarenko@espressif.com'
+AUTHOR = 'M5Stack Systems'
+MAINTAINER = 'M5Stack'
+EMAIL = 'tinyu@m5stack.com'
 
 NAME = 'check-copyright'
 SHORT_DESCRIPTION = 'The script for checking SPDX license header'
-LICENSE = 'Apache License 2.0'
-URL = 'https://github.com/espressif/check-copyright'
+LICENSE = 'MIT'
+URL = 'https://github.com/Tinyu-Zhao/check-copyright'
 REQUIRES = [
     'comment_parser == 1.2.3',
     'thefuzz == 0.19.0',
@@ -21,7 +22,6 @@ REQUIRES = [
 ]
 
 setuptools.setup(
-    
     name=NAME,
     description=SHORT_DESCRIPTION,
     long_description_content_type='text/markdown',
