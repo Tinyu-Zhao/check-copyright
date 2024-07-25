@@ -639,7 +639,7 @@ def main() -> None:
 
         print(f'{TERMINAL_RED}Processed {num_files_processed} source file{"s"[:num_files_processed^1]},', end=' ')
         print(f'{num_files_modified} were modified and {num_files_wrong} have an invalid copyright (excluding ones on the ignore list).{TERMINAL_RESET}')
-        sys.exit(1)  # sys.exit(1) to abort the commit
+        # sys.exit(1)  # sys.exit(1) to abort the commit (for Github Action)
     # pre-commit also automatically aborts a commit if files are modified on disk
     print(f'{TERMINAL_GREEN}Successfully processed {num_files_processed} file{"s"[:num_files_processed^1]}.{TERMINAL_RESET}')
 
